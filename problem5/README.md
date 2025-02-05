@@ -13,40 +13,31 @@
 3. For more details: `ignite chain serve --verbose`
 
 
-## _Resource:_ 
-This project is built using ignite and GO and the blockchain keeps track of `users` details
-### User
+## _Consensus Breaking Change_
 
-- User data structure: `id`, `name`, `email`, `age`, `gender`, `address`
+### Change Made to Exsiting BlockChain
 
-### Interface functionalities (test cases, execution in sequence)
-
-- **Create a User** : 
-    - `cruded tx crude create-user "Alice" "alice@example.com" 25 "Female" "123 Blockchain St." --from alice --chain-id crude --yes`
-    - `cruded tx crude create-user "Bob" "bob@example.com" 25 "Male" "456 Blockchain St." --from alice --chain-id crude --yes`
-    - `cruded tx crude create-user "Charles" "charles@example.com" 30 "Male" "789 Blockchain St." --from alice --chain-id crude --yes`
-- **Get All User**: 
-    - `cruded query crude all-users --chain-id crude`
-- **Get User by ID**: 
-    - Alice: `cruded query crude specific-user 0 --chain-id crude`
-    - Bob: `cruded query crude specific-user 1 --chain-id crude`
-    - Charles: `cruded query crude specific-user 2 --chain-id crude`
-- **Get User by ID (error):** 
-    - `cruded query crude specific-user 9999 --chain-id crude`
-- **Get Users by age (basic flitering for age(uint))**: 
-    - Alice and Bob: `cruded query crude users-by-age 25 --chain-id crude`
-- **Get Users by gender (basic flitering for "Female" or "Male"):** 
-    - Charles: `cruded query crude users-by-gender "Male" --chain-id crude`
-- **Update User Detail:** 
-    - `cruded tx crude update-user 0 "Alice Updated" "alice_new@example.com" 26 "Female" "789 Blockchain Blvd." --from alice --chain-id crude --yes`
-    - check: `cruded query crude specific-user 0 --chain-id crude`
-- **Delete a User:** 
-    - `cruded tx crude delete-user 0 --from alice --chain-id crude --yes`
-    - check: `cruded query crude specific-user 0 --chain-id crude`
-- **Delete a User(error):** 
-    - `cruded tx crude delete-user 9999 --from alice --chain-id crude --yes`
+*   **Change**: Addition of `mobileNo` field of type `uint64` to the `User` data structure in user.proto
+*   **Reason for Change**: To include the mobile number of users as one of the user details in the blockchain message.
 
 
 
+### Questions
+
+**_1. Explain what does it mean by breaking consensus_**
+
+Breaking consensus means making a change to the blockchain protocol or data structure that:
+- Causes nodes running the old version to disagree with nodes running the new version
+- Invalidates previously accepted transactions or blocks for nodes that have not upgraded
+- Requires all nodes to upgrade to stay in sync with the network
+
+
+**_2. Explain why your change would break the consensus._**
+    
+a. Old Nodes Won’t Recognize the New Field. When they receive a transaction or block containing the new field (mobileNo), they cannot parse the data and will reject the block. Stored Data Format Changes
+
+b. If you store User data in key-value format, the stored bytes will no longer match what old nodes expect. Old nodes might fail to decode new users, leading to failed queries and transactions.
+
+c. Blockchains use cryptographic hashes to verify transactions. Since mobileNo changes the data structure, any transaction or block signature created under the old rules will not match the new format. Nodes running different versions will disagree on block validity.
 
 
