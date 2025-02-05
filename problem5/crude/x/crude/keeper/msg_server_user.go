@@ -49,9 +49,6 @@ func (k msgServer) UpdateUser(goCtx context.Context, msg *types.MsgUpdateUser) (
 	}
     fmt.Println("Stored Creator:", val.Creator)
     fmt.Println("Incoming Creator:", msg.Creator)
-	if msg.Creator != val.Creator {
-		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
 	err := k.SetUser(ctx, user)
     if err != nil {
 		return nil, errorsmod.Wrap(sdkerrors.ErrPanic, "Unable to update")
@@ -63,12 +60,9 @@ func (k msgServer) UpdateUser(goCtx context.Context, msg *types.MsgUpdateUser) (
 // delete current user
 func (k msgServer) DeleteUser(goCtx context.Context, msg *types.MsgDeleteUser) (*types.MsgDeleteUserResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	val, found := k.GetUser(ctx, msg.Id)
+	_, found := k.GetUser(ctx, msg.Id)
 	if !found {
 		return nil, errorsmod.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
-	}
-	if msg.Creator != val.Creator {
-		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 	k.RemoveUser(ctx, msg.Id)
 	return &types.MsgDeleteUserResponse{}, nil
