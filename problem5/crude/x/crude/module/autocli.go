@@ -19,9 +19,16 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 				{
 					RpcMethod:      "specificUser",
-					Use:            "get-user [id]",
+					Use:            "specificUser [id]",
 					Short:          "Query specificUser",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "id"}},
+				},
+
+				{
+					RpcMethod:      "AllUsers",
+					Use:            "allUsers",
+					Short:          "Query allUsers",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
 				},
 
 				// this line is used by ignite scaffolding # autocli/query
@@ -43,9 +50,9 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 				{
 					RpcMethod:      "UpdateUser",
-					Use:            "update-user [name] [email] [age] [gender] [address]",
+					Use:            "update-user [id] [name] [email] [age] [gender] [address]",
 					Short:          "Send a updateUser tx",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "name"}, {ProtoField: "email"}, {ProtoField: "age"}, {ProtoField: "gender"}, {ProtoField: "address"}},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "id"}, {ProtoField: "name"}, {ProtoField: "email"}, {ProtoField: "age"}, {ProtoField: "gender"}, {ProtoField: "address"}},
 				},
 				{
 					RpcMethod:      "DeleteUser",

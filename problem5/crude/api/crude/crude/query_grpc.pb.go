@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Query_Params_FullMethodName       = "/crude.crude.Query/Params"
 	Query_SpecificUser_FullMethodName = "/crude.crude.Query/specificUser"
+	Query_AllUsers_FullMethodName     = "/crude.crude.Query/AllUsers"
 )
 
 // QueryClient is the client API for Query service.
@@ -31,6 +32,8 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Queries a list of SpecificUser items.
 	SpecificUser(ctx context.Context, in *QuerySpecificUserRequest, opts ...grpc.CallOption) (*QuerySpecificUserResponse, error)
+	// Queries a list of AllUsers items.
+	AllUsers(ctx context.Context, in *QueryAllUsersRequest, opts ...grpc.CallOption) (*QueryAllUsersResponse, error)
 }
 
 type queryClient struct {
@@ -59,6 +62,15 @@ func (c *queryClient) SpecificUser(ctx context.Context, in *QuerySpecificUserReq
 	return out, nil
 }
 
+func (c *queryClient) AllUsers(ctx context.Context, in *QueryAllUsersRequest, opts ...grpc.CallOption) (*QueryAllUsersResponse, error) {
+	out := new(QueryAllUsersResponse)
+	err := c.cc.Invoke(ctx, Query_AllUsers_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
@@ -67,6 +79,8 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Queries a list of SpecificUser items.
 	SpecificUser(context.Context, *QuerySpecificUserRequest) (*QuerySpecificUserResponse, error)
+	// Queries a list of AllUsers items.
+	AllUsers(context.Context, *QueryAllUsersRequest) (*QueryAllUsersResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -79,6 +93,9 @@ func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*Q
 }
 func (UnimplementedQueryServer) SpecificUser(context.Context, *QuerySpecificUserRequest) (*QuerySpecificUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SpecificUser not implemented")
+}
+func (UnimplementedQueryServer) AllUsers(context.Context, *QueryAllUsersRequest) (*QueryAllUsersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AllUsers not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -129,6 +146,24 @@ func _Query_SpecificUser_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_AllUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).AllUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_AllUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).AllUsers(ctx, req.(*QueryAllUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -143,6 +178,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "specificUser",
 			Handler:    _Query_SpecificUser_Handler,
+		},
+		{
+			MethodName: "AllUsers",
+			Handler:    _Query_AllUsers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
