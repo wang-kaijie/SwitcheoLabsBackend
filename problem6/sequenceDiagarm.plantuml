@@ -1,0 +1,56 @@
+@startuml
+autonumber
+
+actor Client
+participant "API Gateway" as APIG
+participant "Load Balancer" as LB
+participant "Broadcaster Service" as BCS
+participant "Request Queue" as REQ_Q
+participant "Blockchain Node" as BCN
+participant "Response Queue" as RESP_Q
+participant "Retry Queue (Dead Letter Queue)" as RETRY_Q
+database "Database" as DB
+participant "Admin Dashboard" as Admin
+
+Client -> APIG: POST /transaction/broadcast
+APIG -> LB: Forward Request
+LB -> BCS: Forward Request
+BCS -> DB: Store transaction as "Pending"
+BCS -> BCS: Sign Transaction
+BCS -> REQ_Q: Send signed transaction to Request Queue
+
+REQ_Q -> BCN: Blockchain Node Polls & Processes Transaction
+BCN -> RESP_Q: Send Response to Response Queue
+RESP_Q -> BCS: Receive Response
+
+alt Successful Transaction
+    BCS -> DB: Update status to "Success"
+    BCS -> APIG: Return 200 OK
+end
+
+alt Failed Transaction
+    BCS -> DB: Mark transaction as "Failed"
+    BCS -> REQ_Q: Send transaction to Request Queue to retry
+    loop Retry Mechanism
+        REQ_Q -> BCN: Blockchain Node Polls & Processes Transaction
+        BCN -> RESP_Q: Send Response to Response Queue
+        RESP_Q -> BCS: Receive Response
+        alt Retry Successful
+            BCS -> DB: Update status to "Success"
+        else Retry Exhausted
+            BCS -> DB: Mark transaction as permanently failed
+            BCS -> RETRY_Q: Send to Retry Queue
+        end
+    end
+end
+
+alt Timeout Case (1% cases)
+    BCN -> BCS: No response within 30s
+    BCS -> REQ_Q: Add transaction to Request Queue to retry
+end
+
+Admin -> DB: View transaction status
+Admin -> BCS: Trigger manual retry if needed
+BCS -> REQ_Q: Resend transaction from Admin Retry
+
+@enduml
