@@ -19,9 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName       = "/crude.crude.Query/Params"
-	Query_SpecificUser_FullMethodName = "/crude.crude.Query/specificUser"
-	Query_AllUsers_FullMethodName     = "/crude.crude.Query/AllUsers"
+	Query_Params_FullMethodName        = "/crude.crude.Query/Params"
+	Query_SpecificUser_FullMethodName  = "/crude.crude.Query/specificUser"
+	Query_AllUsers_FullMethodName      = "/crude.crude.Query/AllUsers"
+	Query_UsersByAge_FullMethodName    = "/crude.crude.Query/UsersByAge"
+	Query_UsersByGender_FullMethodName = "/crude.crude.Query/UsersByGender"
 )
 
 // QueryClient is the client API for Query service.
@@ -34,6 +36,10 @@ type QueryClient interface {
 	SpecificUser(ctx context.Context, in *QuerySpecificUserRequest, opts ...grpc.CallOption) (*QuerySpecificUserResponse, error)
 	// Queries a list of AllUsers items.
 	AllUsers(ctx context.Context, in *QueryAllUsersRequest, opts ...grpc.CallOption) (*QueryAllUsersResponse, error)
+	// Queries a list of UsersByAge items.
+	UsersByAge(ctx context.Context, in *QueryUsersByAgeRequest, opts ...grpc.CallOption) (*QueryUsersByAgeResponse, error)
+	// Queries a list of UsersByGender items.
+	UsersByGender(ctx context.Context, in *QueryUsersByGenderRequest, opts ...grpc.CallOption) (*QueryUsersByGenderResponse, error)
 }
 
 type queryClient struct {
@@ -71,6 +77,24 @@ func (c *queryClient) AllUsers(ctx context.Context, in *QueryAllUsersRequest, op
 	return out, nil
 }
 
+func (c *queryClient) UsersByAge(ctx context.Context, in *QueryUsersByAgeRequest, opts ...grpc.CallOption) (*QueryUsersByAgeResponse, error) {
+	out := new(QueryUsersByAgeResponse)
+	err := c.cc.Invoke(ctx, Query_UsersByAge_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) UsersByGender(ctx context.Context, in *QueryUsersByGenderRequest, opts ...grpc.CallOption) (*QueryUsersByGenderResponse, error) {
+	out := new(QueryUsersByGenderResponse)
+	err := c.cc.Invoke(ctx, Query_UsersByGender_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
@@ -81,6 +105,10 @@ type QueryServer interface {
 	SpecificUser(context.Context, *QuerySpecificUserRequest) (*QuerySpecificUserResponse, error)
 	// Queries a list of AllUsers items.
 	AllUsers(context.Context, *QueryAllUsersRequest) (*QueryAllUsersResponse, error)
+	// Queries a list of UsersByAge items.
+	UsersByAge(context.Context, *QueryUsersByAgeRequest) (*QueryUsersByAgeResponse, error)
+	// Queries a list of UsersByGender items.
+	UsersByGender(context.Context, *QueryUsersByGenderRequest) (*QueryUsersByGenderResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -96,6 +124,12 @@ func (UnimplementedQueryServer) SpecificUser(context.Context, *QuerySpecificUser
 }
 func (UnimplementedQueryServer) AllUsers(context.Context, *QueryAllUsersRequest) (*QueryAllUsersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AllUsers not implemented")
+}
+func (UnimplementedQueryServer) UsersByAge(context.Context, *QueryUsersByAgeRequest) (*QueryUsersByAgeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UsersByAge not implemented")
+}
+func (UnimplementedQueryServer) UsersByGender(context.Context, *QueryUsersByGenderRequest) (*QueryUsersByGenderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UsersByGender not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -164,6 +198,42 @@ func _Query_AllUsers_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_UsersByAge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryUsersByAgeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).UsersByAge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_UsersByAge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).UsersByAge(ctx, req.(*QueryUsersByAgeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_UsersByGender_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryUsersByGenderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).UsersByGender(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_UsersByGender_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).UsersByGender(ctx, req.(*QueryUsersByGenderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -182,6 +252,14 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AllUsers",
 			Handler:    _Query_AllUsers_Handler,
+		},
+		{
+			MethodName: "UsersByAge",
+			Handler:    _Query_UsersByAge_Handler,
+		},
+		{
+			MethodName: "UsersByGender",
+			Handler:    _Query_UsersByGender_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

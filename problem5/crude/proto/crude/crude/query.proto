@@ -32,6 +32,18 @@ service Query {
     option (google.api.http).get = "/crude/crude/all_users";
   
   }
+  
+  // Queries a list of UsersByAge items.
+  rpc UsersByAge (QueryUsersByAgeRequest) returns (QueryUsersByAgeResponse) {
+    option (google.api.http).get = "/crude/crude/users_by_age/{age}";
+  
+  }
+  
+  // Queries a list of UsersByGender items.
+  rpc UsersByGender (QueryUsersByGenderRequest) returns (QueryUsersByGenderResponse) {
+    option (google.api.http).get = "/crude/crude/users_by_gender/{gender}";
+  
+  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -56,7 +68,27 @@ message QueryAllUsersRequest {
 }
 
 message QueryAllUsersResponse {
-  repeated User users = 1 [(gogoproto.nullable) = false];
+  repeated User                                   users      = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryUsersByAgeRequest {
+  uint32                                age        = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryUsersByAgeResponse {
+  repeated User                                   users      = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryUsersByGenderRequest {
+  string                                gender     = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryUsersByGenderResponse {
+  repeated User                          users      = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

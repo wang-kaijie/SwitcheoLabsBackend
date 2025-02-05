@@ -19,16 +19,30 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 				{
 					RpcMethod:      "specificUser",
-					Use:            "specificUser [id]",
+					Use:            "specific-user [id]",
 					Short:          "Query specificUser",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "id"}},
 				},
 
 				{
 					RpcMethod:      "AllUsers",
-					Use:            "allUsers",
+					Use:            "all-users",
 					Short:          "Query allUsers",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
+				},
+
+				{
+					RpcMethod:      "UsersByAge",
+					Use:            "users-by-age [age]",
+					Short:          "Query usersByAge",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "age"}},
+				},
+
+				{
+					RpcMethod:      "UsersByGender",
+					Use:            "users-by-gender [gender]",
+					Short:          "Query usersByGender",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "gender"}},
 				},
 
 				// this line is used by ignite scaffolding # autocli/query

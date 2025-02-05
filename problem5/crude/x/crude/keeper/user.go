@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"encoding/binary"
 
 	"cosmossdk.io/store/prefix"
@@ -63,14 +64,29 @@ func (k Keeper) GetUser(ctx sdk.Context, id uint64) (val types.User, found bool)
 	return val, true
 }
 
-// SetUser update the user
-func (k Keeper) SetUser(ctx sdk.Context, user types.User) {
+// GetUsersByAge retrieves all the users from the blockchain store that is equal to `age`.
+func (k Keeper) GetUsersByAge(ctx sdk.Context, id uint64) (val types.User, found bool) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.UserKey))
-	b := k.cdc.MustMarshal(&user)
-	store.Set(GetUserIDBytes(user.Id), b)
+	b := store.Get(GetUserIDBytes(id))
+	if b == nil {
+		return val, false
+	}
+	k.cdc.MustUnmarshal(b, &val)
+	return val, true
 }
 
+// SetUser update the user
+func (k Keeper) SetUser(ctx sdk.Context, user types.User) error {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.UserKey))
+	fmt.Println("Updating User in Store:", user)
+	b := k.cdc.MustMarshal(&user)
+	store.Set(GetUserIDBytes(user.Id), b)
+	return nil
+}
+
+// SetUser remove (delele) the user
 func (k Keeper) RemoveUser(ctx sdk.Context, id uint64) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.UserKey))
