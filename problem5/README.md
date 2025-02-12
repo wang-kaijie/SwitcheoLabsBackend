@@ -36,15 +36,14 @@ This project is built using ignite and GO and the blockchain keeps track of `use
 - **Get Users by age (basic flitering for age(uint))**: 
     - Alice and Bob: `cruded query crude users-by-age 25 --chain-id crude`
 - **Get Users by gender (basic flitering for "Female" or "Male"):** 
-    - Charles: `cruded query crude users-by-gender "Male" --chain-id crude`
+    - Alice: `cruded query crude users-by-gender "Female" --chain-id crude`
 - **Update User Detail:** 
     - `cruded tx crude update-user 0 "Alice Updated" "alice_new@example.com" 26 "Female" "789 Blockchain Blvd." --from alice --chain-id crude --yes`
     - check: `cruded query crude specific-user 0 --chain-id crude`
 - **Delete a User:** 
     - `cruded tx crude delete-user 0 --from alice --chain-id crude --yes`
     - check: `cruded query crude specific-user 0 --chain-id crude`
-- **Delete a User(error):** 
-    - `cruded tx crude delete-user 9999 --from alice --chain-id crude --yes`
+
 
 
 
